@@ -31,35 +31,6 @@ Aplikacja "Moje Akwarium" umożliwia:
 - **Format Wymiany Danych:** JSON
 - **Uwierzytelnianie:** Tokeny JWT (JSON Web Tokens)
 
-## Struktura Projektu
-
-/moje-akwarium/
-├── public/                     # Pliki frontendu (HTML, CSS, JS, zasoby)
-│   ├── index.html
-│   ├── gallery.html
-│   ├── css/style.css
-│   ├── js/
-│   │   ├── app.js
-│   │   └── gallery.js
-│   └── assets/
-│       ├── images/             # Obrazki (tła, dekoracje, ryby, efekty)
-│       │   ├── aquarium_elements/
-│       │   ├── aquarium_effects/
-│       │   └── fish_icons/
-│       └── ...
-├── server/                     # Pliki backendu (PHP)
-│   ├── api/                    # Endpointy API (auth.php, fish.php, species.php, aquarium.php, decorations.php)
-│   ├── classes/                # Klasy PHP (Database.php, User.php)
-│   ├── config/                 # Pliki konfiguracyjne (config.php)
-│   ├── includes/               # Pliki pomocnicze (auth_middleware.php)
-│   ├── database/               # Plik bazy danych SQLite (aquarium.sqlite - tworzony automatycznie)
-│   └── vendor/                 # Biblioteki Composera (np. firebase/php-jwt)
-├── docs/                       # Dokumentacja szczegółowa
-│   ├── README_frontend.md
-│   ├── README_backend.md
-│   └── postman_collection.json # (Opcjonalnie) Eksport kolekcji Postmana
-└── README.md                   # Ten plik
-
 ## Instalacja i Uruchomienie
 
 ### Wymagania Wstępne
