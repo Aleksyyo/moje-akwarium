@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje Akwarium</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <span class="logo-icon">🐠</span>
+            <h1>Moje Akwarium</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Akwarium</a></li>
+                <li><a href="gallery.html">Galeria Ryb</a></li>
+                <li id="logout-nav-item" style="display: none;"><a href="#" id="logout-button">Wyloguj</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Sekcja logowania (widoczna, gdy użytkownik nie jest zalogowany) -->
+        <section id="login-section">
+            <h2>Zaloguj się</h2>
+            <form id="login-form">
+                <div>
+                    <label for="login-username">Nazwa użytkownika:</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div>
+                    <label for="login-password">Hasło:</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <button type="submit">Zaloguj</button>
+                <p id="login-error-message" class="error-message" style="display: none;"></p>
+            </form>
+            <p>Nie masz konta? <a href="#" id="show-register-link">Zarejestruj się</a></p>
+        </section>
+
+        <!-- Sekcja rejestracji (początkowo ukryta) -->
+        <section id="register-section" style="display: none;">
+            <h2>Zarejestruj się</h2>
+            <form id="register-form">
+                <div>
+                    <label for="register-username">Nazwa użytkownika:</label>
+                    <input type="text" id="register-username" name="username" required>
+                </div>
+                <div>
+                    <label for="register-password">Hasło:</label>
+                    <input type="password" id="register-password" name="password" required minlength="6">
+                </div>
+                <button type="submit">Zarejestruj</button>
+                <p id="register-error-message" class="error-message" style="display: none;"></p>
+                <p id="register-success-message" class="success-message" style="display: none;"></p>
+            </form>
+            <p>Masz już konto? <a href="#" id="show-login-link">Zaloguj się</a></p>
+        </section>
+
+        <!-- Główne kontrolki i akwarium (widoczne po zalogowaniu) -->
+        <section id="aquarium-dashboard" style="display: none;">
+            <section id="aquarium-controls">
+                <h2>Zarządzanie Akwarium - Witaj <span id="welcome-username"></span>!</h2>
+                <div id="background-selector" style="margin-bottom: 1.5rem; text-align: center;">
+                  <label for="bg-select" style="margin-right: 10px; color: #c0c0c0;">Wybierz tło:</label>
+                  <select id="bg-select" style="padding: 5px; border-radius: 4px; background-color: #1c1c3c; color: #e0e0e0; border: 1px solid #3c3c5c;">
+                      <option value="assets/images/aquarium_elements/background_aquarium_1.png">Tło 1 (Korzeń)</option>
+                      <option value="assets/images/aquarium_elements/background_aquarium_2.png">Tło 2 (Czerwona Roślina)</option>
+                      <option value="assets/images/aquarium_elements/background_aquarium_3.png">Tło 3 (Zielona Roślina)</option>
+                  </select>
+              </div>
+                <div class="controls-grid">
+                    <button id="add-fish-btn">Dodaj Rybę</button>
+                    <button id="decorate-aquarium-btn">Dekoruj Akwarium</button>
+                    <!-- <button id="remove-fish-btn">Usuń WSZYSTKIE Ryby</button> -->
+                    <button id="feed-fish-btn">Nakarm Ryby</button>
+                    <button id="toggle-light-btn" data-status="off">Włącz Światło</button>
+                    <button id="clean-aquarium-btn">Wyczyść Akwarium</button>
+                </div>
+            </section>
+
+            <!-- Kontener dla graficznego akwarium i opcjonalnej listy tekstowej -->
+            <section id="fish-display-container">
+              <div id="aquarium-visual">
+                <img src="assets/images/aquarium_elements/background_aquarium_1.png" alt="Tło akwarium" class="aquarium-bg-layer">
+                <div id="aquarium-water-effect"></div> <!-- NOWA WARSTWA -->
+                <div id="aquarium-decorations">
+                    <!-- ... dekoracje ... -->
+                </div>
+                <div id="fish-entities-layer">
+                    <!-- ... ryby ... -->
+                </div>
+                <div class="aquarium-front-layer"></div>
+            </div>
+
+                <!-- Opcjonalna lista tekstowa ryb, jeśli nadal chcesz ją wyświetlać -->
+                <div id="fish-list-wrapper">
+                    <h3>Aktualne Ryby w Akwarium (lista):</h3>
+                    <ul id="fish-list">
+                        <li>Zaloguj się, aby zobaczyć swoje ryby.</li>
+                    </ul>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <!-- Modal do dodawania ryby -->
+    <div id="add-fish-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Dodaj nową rybę</h2>
+            <form id="add-fish-form">
+                <div>
+                    <label for="fish-name">Nazwa ryby:</label>
+                    <input type="text" id="fish-name" name="fish-name" required>
+                </div>
+                <div>
+                    <label for="fish-species">Gatunek:</label>
+                    <select id="fish-species" name="fish-species" required>
+                        <option value="">-- Wybierz gatunek --</option>
+                        <!-- Gatunki będą ładowane dynamicznie przez JS z API -->
+                    </select>
+                </div>
+                <button type="submit">Dodaj rybę</button>
+            </form>
+            <p id="modal-error-message" class="error-message" style="display: none;"></p>
+        </div>
+    </div>
+    <div id="decoration-panel" class="modal"> <!-- Użyjemy podobnych stylów co modal ryb -->
+      <div class="modal-content decoration-modal-content">
+          <span class="close-button" id="close-decoration-panel">&times;</span>
+          <h2>Wybierz Dekoracje</h2>
+          <div id="available-decorations-list" class="decorations-grid">
+              <!-- Tutaj JS załaduje dostępne dekoracje -->
+              <p>Ładowanie dostępnych dekoracji...</p>
+          </div>
+          <div style="text-align: center; margin-top: 20px;">
+              <button id="save-decorations-btn" class="control-button">Zapisz Układ Dekoracji</button>
+              <!-- Przycisk zapisu może być potrzebny później, gdy dodamy drag&drop -->
+          </div>
+      </div>
+  </div>
+
+    <footer>
+        <p>&copy; 2025 Moje Akwarium</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

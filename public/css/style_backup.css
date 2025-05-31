@@ -1,0 +1,680 @@
+/* Podstawowe resetowanie stylów */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #0a0a23; /* Ciemny granat/czarny jako tło główne */
+  color: #e0e0e0; /* Jasny kolor tekstu dla kontrastu */
+  line-height: 1.6;
+  display: flex; /* Umożliwia przyklejenie stopki na dole */
+  flex-direction: column; /* Elementy układane w kolumnie */
+  min-height: 100vh; /* Minimalna wysokość body na całą wysokość okna */
+}
+
+header {
+  background-color: #1c1c3c; /* Ciemny fiolet/granat */
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #4a00e0; /* Akcent fioletowy */
+  width: 100%; /* Aby header zajmował całą szerokość */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-container .logo-icon {
+  font-size: 2rem;
+  margin-right: 0.5rem;
+  color: #8e2de2; /* Fioletowy */
+}
+
+.logo-container h1 {
+  color: #f0f0f0;
+  font-size: 1.8rem;
+}
+
+nav ul {
+  list-style-type: none;
+  display: flex;
+}
+
+nav ul li {
+  margin-left: 20px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #c0c0c0;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+  background-color: #4a00e0; /* Fioletowy */
+  color: #ffffff;
+}
+
+main {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%; /* Aby main zajmował dostępną szerokość */
+  flex-grow: 1; /* Pozwala main rozciągnąć się i wypchnąć stopkę na dół */
+}
+
+/* Style dla sekcji logowania i rejestracji */
+#login-section, #register-section {
+  max-width: 450px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #1c1c3c;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+#login-section h2, #register-section h2,
+#aquarium-controls h2, #fish-display h3 {
+  color: #bb86fc; /* Jasny fiolet dla nagłówków sekcji */
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #3c3c5c; /* Separator */
+  padding-bottom: 0.5rem;
+}
+
+#login-form div, #register-form div {
+  margin-bottom: 1rem;
+}
+
+#login-form label, #register-form label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #c0c0c0;
+}
+
+#login-form input[type="text"],
+#login-form input[type="password"],
+#register-form input[type="text"],
+#register-form input[type="password"] {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #3c3c5c;
+  border-radius: 5px;
+  background-color: #0a0a23;
+  color: #e0e0e0;
+  font-size: 1rem;
+}
+
+#login-form input[type="text"]:focus,
+#login-form input[type="password"]:focus,
+#register-form input[type="text"]:focus,
+#register-form input[type="password"]:focus {
+  outline: none;
+  border-color: #8e2de2;
+}
+
+#login-form button[type="submit"],
+#register-form button[type="submit"] {
+  background-color: #8e2de2;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+#login-form button[type="submit"]:hover,
+#register-form button[type="submit"]:hover {
+  background-color: #4a00e0;
+}
+
+#login-section p, #register-section p {
+  text-align: center;
+  margin-top: 1rem;
+  color: #a0a0a0;
+}
+
+#login-section p a, #register-section p a {
+  color: #bb86fc;
+  text-decoration: none;
+}
+
+#login-section p a:hover, #register-section p a:hover {
+  text-decoration: underline;
+}
+
+/* Komunikat o błędzie */
+.error-message {
+  color: #ff6b6b; /* Czerwony dla błędów */
+  background-color: rgba(255, 107, 107, 0.1);
+  border: 1px solid #ff6b6b;
+  padding: 0.7rem;
+  border-radius: 5px;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+/* Komunikat o sukcesie */
+.success-message {
+  color: #5cb85c; /* Zielony dla sukcesu */
+  background-color: rgba(92, 184, 92, 0.1);
+  border: 1px solid #5cb85c;
+  padding: 0.7rem;
+  border-radius: 5px;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+
+/* Kontrolki akwarium */
+.controls-grid {
+  display: grid;
+  /* Domyślnie dla desktopu - więcej kolumn */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.controls-grid button {
+  background-color: #8e2de2; /* Fioletowy */
+  color: white;
+  border: none;
+  padding: 0.8rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  min-height: 50px; /* Minimalna wysokość przycisków dla spójności */
+  display: flex; /* Dla wyśrodkowania tekstu w przycisku */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.controls-grid button:hover {
+  background-color: #4a00e0; /* Ciemniejszy fiolet */
+}
+
+/* Wyświetlanie ryb */
+#fish-display {
+  margin-top: 2rem;
+  /* W przyszłości tutaj można dodać tło z liśćmi */
+  background-image: url('../assets/images/background/background_aquarium_1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 1rem; /* Dodajemy padding, aby tło nie przylegało do krawędzi listy
+  background-color: rgba(28, 28, 60, 0.7); /* Lekko przezroczyste tło, aby tło strony było widoczne */
+  border-radius: 8px;
+  min-height: 300px; /* Minimalna wysokość dla sekcji akwarium */
+  position: relative; /* Dla ewentualnego pozycjonowania elementów wewnątrz */
+}
+
+
+#fish-list {
+  list-style-type: none;
+  padding: 1rem;
+  background-color: rgba(10, 10, 35, 0.5); /* Ciemniejsze, bardziej przezroczyste tło listy ryb */
+  border-radius: 5px;
+  min-height: 150px; /* Minimalna wysokość samej listy ryb */
+}
+
+#fish-list li {
+  padding: 0.7rem 0.5rem;
+  border-bottom: 1px dashed #3c3c5c;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e0e0e0; /* Upewniamy się, że tekst ryby jest jasny */
+}
+
+#fish-list li:last-child {
+  border-bottom: none;
+}
+
+.delete-fish-item-btn {
+  background-color: #c70039;
+  color: white;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.delete-fish-item-btn:hover {
+  background-color: #900c3f;
+}
+
+
+/* Style dla przycisku światła (on/off) */
+#toggle-light-btn[data-status="on"] {
+  background-color: #f0e68c; /* Jasnożółty, gdy włączone */
+  color: #1c1c3c;
+}
+#toggle-light-btn[data-status="on"]:hover {
+  background-color: #fffacd; /* Jaśniejszy żółty */
+}
+
+/* Style dla Modala */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background-color: #1c1c3c;
+  color: #e0e0e0;
+  margin: 10% auto;
+  padding: 25px;
+  border: 1px solid #4a00e0;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-content h2 {
+  color: #bb86fc;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: #e0e0e0;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#add-fish-form div {
+  margin-bottom: 1rem;
+}
+
+#add-fish-form label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #c0c0c0;
+}
+
+#add-fish-form input[type="text"],
+#add-fish-form select {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #3c3c5c;
+  border-radius: 5px;
+  background-color: #0a0a23;
+  color: #e0e0e0;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+#add-fish-form input[type="text"]:focus,
+#add-fish-form select:focus {
+  outline: none;
+  border-color: #8e2de2;
+}
+
+#add-fish-form button[type="submit"] {
+  background-color: #8e2de2;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+#add-fish-form button[type="submit"]:hover {
+  background-color: #4a00e0;
+}
+
+
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #1c1c3c;
+  color: #a0a0a0;
+  margin-top: auto; /* Przykleja stopkę na dole, jeśli body ma display:flex i flex-direction:column */
+  width: 100%; /* Aby stopka zajmowała całą szerokość */
+  border-top: 1px solid #3c3c5c;
+}
+
+/* --- RWD --- */
+
+/* Podstawowe RWD dla nagłówka na mniejszych ekranach */
+@media (max-width: 768px) { /* Zmieniono z 768px na 767px dla spójności z galerią */
+  header {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 1rem; /* Mniejszy padding na mobilce */
+  }
+
+  .logo-container h1 {
+      font-size: 1.6rem;
+  }
+  .logo-container .logo-icon {
+      font-size: 1.9rem;
+  }
+
+  nav {
+      width: 100%; /* Nawigacja zajmuje całą szerokość */
+  }
+  nav ul {
+      margin-top: 1rem;
+      flex-direction: column;
+      width: 100%;
+  }
+
+  nav ul li {
+      margin-left: 0;
+      margin-bottom: 0.5rem;
+      width: 100%;
+  }
+
+  nav ul li a {
+      display: block;
+      text-align: center;
+  }
+
+  main {
+      padding: 1rem; /* Mniejszy padding na mobilce */
+  }
+
+  /* Zmiana dla .controls-grid - przyciski obok siebie */
+  .controls-grid {
+      /* Używamy flexboxa dla lepszej kontroli zawijania na mobilce */
+      display: flex;
+      flex-wrap: wrap; /* Pozwól przyciskom zawijać się do nowego wiersza */
+      justify-content: space-around; /* Rozłożenie przycisków */
+      gap: 0.5rem; /* Mniejszy odstęp */
+  }
+
+  .controls-grid button {
+      flex-grow: 1; /* Pozwól przyciskom rosnąć, aby wypełnić przestrzeń */
+      flex-basis: calc(50% - 0.5rem); /* Dwa przyciski w rzędzie (minus połowa gap) */
+      /* Można też użyć min-width, np. flex-basis: 120px; */
+      font-size: 0.9rem;
+      padding: 0.7rem 0.5rem; /* Mniejszy padding */
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-container h1 {
+      font-size: 1.4rem;
+  }
+  .logo-container .logo-icon {
+      font-size: 1.7rem;
+  }
+
+  .controls-grid button {
+      /* Na bardzo małych ekranach można wrócić do jednego przycisku na wiersz */
+      /* lub zostawić dwa, jeśli tekst się mieści */
+      flex-basis: calc(100% - 0.5rem); /* Jeden przycisk w rzędzie */
+      /* lub flex-basis: calc(50% - 0.5rem); jeśli chcemy nadal dwa */
+  }
+
+  .modal-content {
+      width: 90%; /* Modal zajmuje więcej miejsca na małych ekranach */
+      margin: 5% auto;
+      padding: 20px;
+  }
+}
+
+
+/* Style dla Galerii Ryb - RWD */
+#fish-gallery-section h2 {
+  color: #bb86fc;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #3c3c5c;
+  padding-bottom: 0.5rem;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.fish-card {
+  background-color: #1c1c3c;
+  border: 1px solid #3c3c5c;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex; /* Dla lepszego ułożenia zawartości w karcie */
+  flex-direction: column;
+  justify-content: space-between; /* Rozkłada elementy w pionie */
+}
+
+.fish-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(74, 0, 224, 0.4);
+}
+
+.fish-card-image {
+  width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  background-color: #2a2a4a;
+}
+
+.fish-card h3 {
+  color: #e0e0e0;
+  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+  flex-grow: 0; /* Aby nie rozciągał się za bardzo */
+}
+
+.fish-card p {
+  color: #c0c0c0;
+  font-size: 1rem;
+  line-height: 1.4;
+  flex-grow: 1; /* Pozwala opisowi zająć dostępną przestrzeń */
+}
+
+.gallery-grid > p { /* Komunikat o braku ryb */
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #a0a0a0;
+  padding: 2rem;
+}
+
+/* RWD dla Galerii */
+@media (min-width: 1200px) {
+  .gallery-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+  }
+  .fish-card {
+      padding: 1.8rem;
+  }
+  .fish-card h3 {
+      font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  #fish-gallery-section h2 {
+      font-size: 1.8rem;
+  }
+  .gallery-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+  }
+  .fish-card {
+      padding: 1rem;
+  }
+  .fish-card h3 {
+      font-size: 1.2rem;
+  }
+  .fish-card p {
+      font-size: 0.9rem;
+  }
+  .fish-card-image {
+      max-height: 120px;
+  }
+}
+
+@media (max-width: 479px) {
+  .gallery-grid {
+      grid-template-columns: 1fr;
+  }
+}
+
+/* Styl dla przycisku-linku (używany w gallery.js) */
+.button-like {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #8e2de2;
+  color: white !important; /* Ważne, aby nadpisać domyślny kolor linku */
+  text-decoration: none;
+  border-radius: 5px;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+.button-like:hover {
+  background-color: #4a00e0;
+  color: white !important;
+}
+
+#fish-display-container {
+    margin-top: 2rem;
+    /* Możesz chcieć, aby kontener był responsywny i zachowywał proporcje */
+}
+
+#aquarium-visual {
+    position: relative; /* Kluczowe dla pozycjonowania warstw */
+    width: 100%; /* Dopasuj do kontenera nadrzędnego */
+    max-width: 800px; /* Przykładowa maksymalna szerokość akwarium */
+    /* Możesz ustawić proporcje za pomocą padding-bottom hack, jeśli obrazki mają stałe proporcje */
+    /* np. padding-bottom: 56.25%; (dla proporcji 16:9) jeśli wysokość ma być dynamiczna */
+    /* Lub ustawić stałą wysokość */
+    height: 500px; /* Przykładowa wysokość */
+    margin: 0 auto; /* Wyśrodkowanie */
+    overflow: hidden; /* Aby elementy nie wychodziły poza "obudowę" */
+    border-radius: 10px; /* Jeśli obudowa ma zaokrąglone rogi */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.aquarium-bg-layer,
+.aquarium-front-layer,
+#aquarium-decorations,
+#fish-entities-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.aquarium-bg-layer {
+    z-index: 1; /* Tło na samym dole */
+    object-fit: cover; /* Rozciągnij, aby wypełnić */
+}
+
+#aquarium-decorations {
+    z-index: 2; /* Ozdoby nad tłem */
+}
+
+#fish-entities-layer {
+    z-index: 3; /* Ryby nad ozdobami */
+}
+
+.aquarium-front-layer {
+    z-index: 10; /* Obudowa na samym wierzchu */
+    pointer-events: none; /* Aby można było klikać "przez" obudowę na elementy pod spodem */
+    object-fit: contain; /* Lub cover, w zależności od obrazka obudowy */
+}
+
+/* Styl dla pojedynczych dekoracji */
+.decoration {
+    position: absolute; /* Pozycjonowanie wewnątrz #aquarium-decorations */
+    /* Rozmiary i pozycje ustawisz indywidualnie dla każdej dekoracji */
+    /* np. dla #rock1, #plant1 */
+}
+
+#rock1 {
+    bottom: 10px;
+    left: 50px;
+    width: 150px; /* Przykładowy rozmiar */
+    height: auto;
+}
+
+#plant1 {
+    bottom: 5px;
+    right: 30px;
+    width: 100px; /* Przykładowy rozmiar */
+    height: auto;
+}
+
+/* Styl dla encji ryb (obrazków ryb) */
+.fish-entity {
+    position: absolute;
+    /* Rozmiar i początkowa pozycja będą ustawiane przez JS */
+    width: 80px; /* Przykładowy rozmiar ryby */
+    height: auto;
+    transition: transform 0.5s ease-out; /* Dla płynnego ruchu */
+}
+
+/* Wrapper dla listy tekstowej, jeśli jest używany */
+#fish-list-wrapper {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: rgba(28, 28, 60, 0.7);
+    border-radius: 8px;
+}
+
+#fish-list-wrapper h3 { /* Nadpisanie ogólnego stylu h3 jeśli potrzeba */
+    color: #bb86fc;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #3c3c5c;
+}
+
+#fish-list { /* Już mamy style dla #fish-list, można je dostosować */
+    min-height: 100px; /* Mniejsza minimalna wysokość, jeśli jest obok grafiki */
+}

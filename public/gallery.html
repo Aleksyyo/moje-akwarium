@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria Ryb - Moje Akwarium</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <span class="logo-icon">🐠</span>
+            <h1>Moje Akwarium</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Akwarium</a></li>
+                <li><a href="gallery.html" class="active">Galeria Ryb</a></li>
+                <!-- Dodano ID dla elementu wylogowania -->
+                <li id="logout-nav-item" style="display: none;"><a href="#" id="logout-button">Wyloguj</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="fish-gallery-section">
+            <h2>Galeria Ryb</h2>
+            <div class="gallery-grid">
+                <p>Ładowanie galerii...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Moje Akwarium</p>
+    </footer>
+
+    <script src="js/gallery.js"></script>
+</body>
+</html>
