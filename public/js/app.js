@@ -714,121 +714,114 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const renderPlacedDecorations = (placedDecorations) => {
-      if (!aquariumDecorationsLayer) return;
-      aquariumDecorationsLayer.innerHTML = '';
-      placedDecorations.forEach(deco => {
-          const decoWrapper = document.createElement('div');
-          decoWrapper.classList.add('placed-decoration-wrapper');
-          decoWrapper.style.position = 'absolute';
-          decoWrapper.style.left = `${deco.pos_x}px`;
-          decoWrapper.style.top = `${deco.pos_y}px`;
-          decoWrapper.style.width = deco.width ? `${deco.width}px` : `${deco.default_width || 100}px`;
-          decoWrapper.style.transform = `rotate(${deco.rotation || 0}deg)`;
-          decoWrapper.style.zIndex = deco.z_index || 2;
-          decoWrapper.dataset.userPlacedId = deco.user_placed_id;
+    if (!aquariumDecorationsLayer) {
+        console.error("Warstwa dekoracji (#aquarium-decorations) nie znaleziona!");
+        return;
+    }
+    aquariumDecorationsLayer.innerHTML = ''; // Wyczyść poprzednie
+    console.log("Renderowanie umieszczonych dekoracji:", placedDecorations); // LOG
 
-          const decoImg = document.createElement('img');
-          decoImg.classList.add('decoration-img');
-          decoImg.src = `assets/images/aquarium_elements/${deco.image_path}`;
-          decoImg.alt = deco.name;
-          decoImg.title = deco.name;
-          decoImg.style.width = '100%';
-          decoImg.style.height = 'auto';
-          if (deco.height && deco.width) {
-              decoImg.style.height = `${deco.height}px`;
-          }
+    placedDecorations.forEach(deco => {
+        const decoWrapper = document.createElement('div');
+        decoWrapper.classList.add('placed-decoration-wrapper');
+        decoWrapper.style.position = 'absolute';
+        decoWrapper.style.left = `${deco.pos_x}px`;
+        decoWrapper.style.top = `${deco.pos_y}px`;
+        decoWrapper.style.width = deco.width ? `${deco.width}px` : `${deco.default_width || 100}px`;
+        decoWrapper.style.transform = `rotate(${deco.rotation || 0}deg)`;
+        decoWrapper.style.zIndex = deco.z_index || 3; // Zmieniono z-index na 3, aby był spójny z rybami na 4
+        decoWrapper.dataset.userPlacedId = deco.user_placed_id;
 
-          const deleteDecoBtn = document.createElement('span');
-          deleteDecoBtn.classList.add('delete-placed-deco-btn');
-          deleteDecoBtn.innerHTML = '&times;';
-          deleteDecoBtn.title = 'Usuń dekorację';
-          deleteDecoBtn.style.display = 'none'; // Domyślnie ukryty
+        const decoImg = document.createElement('img');
+        decoImg.classList.add('decoration-img');
+        decoImg.src = `assets/images/aquarium_elements/${deco.image_path}`;
+        decoImg.alt = deco.name;
+        decoImg.title = deco.name;
+        decoImg.style.width = '100%';
+        decoImg.style.height = 'auto';
+        if (deco.height && deco.width) {
+            decoImg.style.height = `${deco.height}px`;
+        }
 
-          deleteDecoBtn.addEventListener('click', async (e) => {
-              e.stopPropagation();
-              if (confirm(`Czy na pewno chcesz usunąć "${deco.name}"?`)) {
-                  try {
-                      const result = await apiRequest(`decorations.php?type=user&user_decoration_id=${deco.user_placed_id}`, 'DELETE', null, true);
-                      if (result.success) {
-                          loadUserDecorations();
-                          selectedPlacedDecoration = null;
-                      } else {
-                          alert(`Nie udało się usunąć dekoracji: ${result.message}`);
-                      }
-                  } catch (error) {
-                      alert(`Błąd serwera: ${error.message}`);
-                  }
-              }
-          });
+        const deleteDecoBtn = document.createElement('span');
+        deleteDecoBtn.classList.add('delete-placed-deco-btn');
+        deleteDecoBtn.innerHTML = '&times;';
+        deleteDecoBtn.title = 'Usuń dekorację';
+        deleteDecoBtn.style.display = 'none'; // Domyślnie ukryty
 
-          decoWrapper.appendChild(decoImg);
-          decoWrapper.appendChild(deleteDecoBtn);
-          aquariumDecorationsLayer.appendChild(decoWrapper);
+        deleteDecoBtn.addEventListener('click', async (e) => {
+            e.stopPropagation(); // Zapobiegaj zaznaczeniu po kliknięciu X
+            console.log(`Kliknięto X dla dekoracji ID: ${deco.user_placed_id}, Nazwa: ${deco.name}`); // LOG
+            if (confirm(`Czy na pewno chcesz usunąć "${deco.name}"?`)) {
+                console.log(`Potwierdzono usunięcie dekoracji ID: ${deco.user_placed_id}`); // LOG
+                try {
+                    const result = await apiRequest(`decorations.php?type=user&user_decoration_id=${deco.user_placed_id}`, 'DELETE', null, true);
+                    console.log("Odpowiedź API na usunięcie:", result); // LOG
+                    if (result.success) {
+                        console.log("Dekoracja usunięta pomyślnie z serwera."); // LOG
+                        loadUserDecorations(); // Odśwież widok dekoracji
+                        selectedPlacedDecoration = null; // Odznacz, jeśli była zaznaczona
+                    } else {
+                        alert(`Nie udało się usunąć dekoracji: ${result.message}`);
+                    }
+                } catch (error) {
+                    console.error("Błąd API podczas usuwania dekoracji:", error); // LOG
+                    alert(`Błąd serwera podczas usuwania dekoracji: ${error.message}`);
+                }
+            } else {
+                console.log(`Anulowano usunięcie dekoracji ID: ${deco.user_placed_id}`); // LOG
+            }
+        });
 
-          decoWrapper.addEventListener('click', (e) => {
-              console.log("Wrapper kliknięty, user_placed_id:", deco.user_placed_id); // LOG
-              handleSelectPlacedDecoration(decoWrapper, deco);
-          });
-      });
-  };
+        decoWrapper.appendChild(decoImg);
+        decoWrapper.appendChild(deleteDecoBtn); // Upewnij się, że przycisk jest dodany do DOM
+        aquariumDecorationsLayer.appendChild(decoWrapper);
 
-  const handleAddDecorationToAquarium = async (decoTemplate) => {
-      console.log("Dodawanie dekoracji:", decoTemplate.name);
-      const aquariumWidth = aquariumVisual ? aquariumVisual.offsetWidth : 600;
-      const aquariumHeight = aquariumVisual ? aquariumVisual.offsetHeight : 400;
-      const decoWidth = decoTemplate.default_width || 100;
-      const decoHeight = decoTemplate.default_height || 100;
+        decoWrapper.addEventListener('click', (e) => {
+            // Nie chcemy, aby kliknięcie na już zaznaczony przycisk 'X' ponownie wywoływało handleSelect
+            if (e.target !== deleteDecoBtn) {
+                console.log("Wrapper kliknięty (nie przycisk X), user_placed_id:", deco.user_placed_id); // LOG
+                handleSelectPlacedDecoration(decoWrapper, deco);
+            }
+        });
+    });
+};
 
-      const defaultPosX = Math.max(0, Math.floor(Math.random() * (aquariumWidth - decoWidth)));
-      const defaultPosY = Math.max(0, aquariumHeight - decoHeight - 5);
+const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
+    console.log("handleSelectPlacedDecoration wywołana dla:", decoData.name, "ID:", decoData.user_placed_id); // LOG
 
-      const newDecorationData = {
-          decoration_id: decoTemplate.id,
-          pos_x: defaultPosX,
-          pos_y: defaultPosY,
-          width: decoWidth,
-          height: decoHeight,
-          rotation: 0,
-          z_index: 2
-      };
-      try {
-          const result = await apiRequest('decorations.php?type=user', 'POST', newDecorationData, true);
-          if (result.success && result.decoration) {
-              loadUserDecorations();
-              if (decorationPanel) decorationPanel.style.display = 'none';
-          } else {
-              alert(`Nie udało się dodać dekoracji: ${result.message || 'Nieznany błąd'}`);
-          }
-      } catch (error) {
-          alert(`Błąd serwera podczas dodawania dekoracji: ${error.message}`);
-      }
-  };
-  
-  const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
-      console.log("handleSelectPlacedDecoration wywołana dla:", decoData.name); // LOG
+    // Odznacz poprzednią, jeśli istnieje i jest inna niż aktualnie kliknięta
+    if (selectedPlacedDecoration && selectedPlacedDecoration.element && selectedPlacedDecoration.element !== decoWrapperElement) {
+        console.log("Odznaczanie poprzedniej:", selectedPlacedDecoration.data.name); // LOG
+        selectedPlacedDecoration.element.style.outline = 'none';
+        const prevDeleteBtn = selectedPlacedDecoration.element.querySelector('.delete-placed-deco-btn');
+        if (prevDeleteBtn) {
+            prevDeleteBtn.style.display = 'none';
+            console.log("Ukryto przycisk usuwania dla poprzedniej."); // LOG
+        }
+    }
 
-      if (selectedPlacedDecoration && selectedPlacedDecoration.element) {
-          console.log("Odznaczanie poprzedniej:", selectedPlacedDecoration.data.name); // LOG
-          selectedPlacedDecoration.element.style.outline = 'none';
-          const prevDeleteBtn = selectedPlacedDecoration.element.querySelector('.delete-placed-deco-btn');
-          if (prevDeleteBtn) {
-              prevDeleteBtn.style.display = 'none';
-              console.log("Ukryto przycisk usuwania dla poprzedniej."); // LOG
-          } else {
-              console.warn("Nie znaleziono przycisku usuwania dla poprzednio zaznaczonej dekoracji.");
-          }
-      }
-
-      decoWrapperElement.style.outline = '2px dashed #8e2de2';
-      const currentDeleteBtn = decoWrapperElement.querySelector('.delete-placed-deco-btn');
-      if (currentDeleteBtn) {
-          currentDeleteBtn.style.display = 'block';
-          console.log("Pokazano przycisk usuwania dla:", decoData.name, currentDeleteBtn); // LOG
-      } else {
-          console.error("Nie znaleziono przycisku .delete-placed-deco-btn wewnątrz wrapper'a", decoWrapperElement);
-      }
-      selectedPlacedDecoration = { element: decoWrapperElement, data: decoData };
-  };
+    // Przełącz zaznaczenie dla aktualnie klikniętego elementu
+    if (selectedPlacedDecoration && selectedPlacedDecoration.element === decoWrapperElement) {
+        // Jeśli kliknięto ten sam element, odznacz go
+        decoWrapperElement.style.outline = 'none';
+        const currentDeleteBtn = decoWrapperElement.querySelector('.delete-placed-deco-btn');
+        if (currentDeleteBtn) currentDeleteBtn.style.display = 'none';
+        selectedPlacedDecoration = null;
+        console.log("Odznaczono dekorację:", decoData.name); // LOG
+    } else {
+        // Zaznacz nowy element
+        decoWrapperElement.style.outline = '2px dashed #8e2de2';
+        const currentDeleteBtn = decoWrapperElement.querySelector('.delete-placed-deco-btn');
+        if (currentDeleteBtn) {
+            currentDeleteBtn.style.display = 'block';
+            console.log("Pokazano przycisk usuwania dla:", decoData.name, currentDeleteBtn); // LOG
+        } else {
+            console.error("Nie znaleziono przycisku .delete-placed-deco-btn wewnątrz wrapper'a", decoWrapperElement);
+        }
+        selectedPlacedDecoration = { element: decoWrapperElement, data: decoData };
+    }
+};
 
   // --- Event Listenery dla przycisków akcji (światło, karmienie, czyszczenie, usuń wszystkie ryby) ---
   if (toggleLightBtn) {

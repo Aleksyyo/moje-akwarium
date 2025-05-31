@@ -33,6 +33,8 @@ header {
   align-items: center;
 }
 
+
+
 .logo-container .logo-icon {
   font-size: 2rem;
   margin-right: 0.5rem;
@@ -433,24 +435,64 @@ main {
 
 .delete-placed-deco-btn {
   position: absolute;
-  top: -8px; /* Lekko nad górną krawędzią */
-  right: -8px; /* Lekko za prawą krawędzią */
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
   background-color: #c70039;
   color: white;
-  border: none;
-  border-radius: 50%; /* Okrągły przycisk */
-  width: 20px;
-  height: 20px;
-  font-size: 14px;
-  line-height: 18px; /* Wyśrodkowanie 'X' w pionie */
+  border: 1px solid white;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 22px; /* Ważne dla wyśrodkowania 'X' */
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  display: none; /* Domyślnie ukryty, pokazywany przez JS */
-  z-index: 5; /* Nad obrazkiem dekoracji */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  z-index: 5; /* Powinno być wystarczająco wysokie w kontekście wrappera dekoracji */
+  display: none;    /* Domyślnie ukryty, JS zmienia na 'block' */
+  user-select: none;
 }
 .delete-placed-deco-btn:hover {
-  background-color: #900c3f;
+  background-color: #ff4136;
+}
+
+#background-selector {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  padding: 10px;
+  background-color: rgba(28, 28, 60, 0.5); /* Lekkie tło dla sekcji */
+  border-radius: 8px;
+  display: flex; /* Dla lepszego ułożenia label i select */
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Odstęp między label a select */
+}
+
+#background-selector label {
+  color: #c0c0c0;
+  font-size: 0.9rem;
+}
+
+#bg-select {
+  padding: 8px 12px;
+  border-radius: 5px;
+  background-color: #12122d; /* Ciemniejsze tło dla selecta */
+  color: #e0e0e0;
+  border: 1px solid #3c3c5c;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none; /* Usuń domyślny outline przy focusie */
+  transition: border-color 0.3s ease;
+}
+
+#bg-select:hover {
+  border-color: #8e2de2; /* Akcent przy najechaniu */
+}
+
+#bg-select:focus {
+  border-color: #4a00e0; /* Mocniejszy akcent przy focusie */
+  box-shadow: 0 0 5px rgba(74, 0, 224, 0.5);
 }
 
 .decoration-modal-content { /* Specyficzne dla modala dekoracji */
