@@ -21,7 +21,7 @@ try {
         // Pobierz wszystkie ryby dla zalogowanego użytkownika
         // Łączymy z fish_species, aby uzyskać nazwę gatunku i ścieżkę obrazka
         $stmt = $pdo->prepare("
-            SELECT f.id, f.name, f.added_at, fs.name as species_name, fs.image_path as species_image_path
+            SELECT f.id, f.name, f.added_at, f.weight, f.size, f.description, fs.name as species_name, fs.image_path as species_image_path
             FROM fish f
             JOIN fish_species fs ON f.species_id = fs.id
             WHERE f.user_id = :user_id
@@ -36,6 +36,9 @@ try {
         $input = json_decode(file_get_contents('php://input'), true);
         $fishName = $input['name'] ?? null;
         $speciesId = $input['species_id'] ?? null;
+        $weight = isset($input['weight']) ? $input['weight'] : null;
+        $size = isset($input['size']) ? $input['size'] : null;
+        $description = isset($input['description']) ? $input['description'] : null;
 
         if (empty($fishName) || empty($speciesId)) {
             http_response_code(400);
@@ -48,11 +51,14 @@ try {
                 http_response_code(400);
                 $response = ['success' => false, 'message' => 'Wybrany gatunek nie istnieje.'];
             } else {
-                $stmt = $pdo->prepare("INSERT INTO fish (user_id, name, species_id) VALUES (:user_id, :name, :species_id)");
+                $stmt = $pdo->prepare("INSERT INTO fish (user_id, name, species_id, weight, size, description) VALUES (:user_id, :name, :species_id, :weight, :size, :description)");
                 $stmt->execute([
                     'user_id' => $userId,
                     'name' => $fishName,
-                    'species_id' => $speciesId
+                    'species_id' => $speciesId,
+                    'weight' => $weight,
+                    'size' => $size,
+                    'description' => $description
                 ]);
                 $newFishId = $pdo->lastInsertId();
                 $response = ['success' => true, 'message' => 'Ryba dodana pomyślnie.', 'fish_id' => $newFishId];

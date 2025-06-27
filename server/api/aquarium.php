@@ -48,22 +48,31 @@ try {
             $newLightStatus = $currentSettings['light_status'] == 1 ? 0 : 1;
             $stmt = $pdo->prepare("UPDATE user_aquarium_settings SET light_status = :light_status WHERE user_id = :user_id");
             $stmt->execute(['light_status' => $newLightStatus, 'user_id' => $userId]);
-            
-            $response = ['success' => true, 'message' => 'Światło przełączone.', 'light_on' => (bool)$newLightStatus];
+            // Pobierz aktualne wartości po zmianie
+            $settings = getOrCreateUserSettings($pdo, $userId);
+            $response = [
+                'success' => true,
+                'message' => 'Światło przełączone.',
+                'light_on' => (bool)$newLightStatus,
+                'last_fed_at' => $settings['last_fed_at'],
+                'last_cleaned_at' => $settings['last_cleaned_at'],
+                'hunger_level' => $settings['hunger_level'],
+                'dirt_level' => $settings['dirt_level']
+            ];
             http_response_code(200);
 
         } elseif ($action === 'feed') {
             $now = date('Y-m-d H:i:s');
-            $stmt = $pdo->prepare("UPDATE user_aquarium_settings SET last_fed_at = :now WHERE user_id = :user_id");
+            $stmt = $pdo->prepare("UPDATE user_aquarium_settings SET last_fed_at = :now, hunger_level = 0 WHERE user_id = :user_id");
             $stmt->execute(['now' => $now, 'user_id' => $userId]);
-            $response = ['success' => true, 'message' => 'Ryby nakarmione.', 'last_fed_at' => $now];
+            $response = ['success' => true, 'message' => 'Ryby nakarmione.', 'last_fed_at' => $now, 'hunger_level' => 0];
             http_response_code(200);
 
         } elseif ($action === 'clean') {
             $now = date('Y-m-d H:i:s');
-            $stmt = $pdo->prepare("UPDATE user_aquarium_settings SET last_cleaned_at = :now WHERE user_id = :user_id");
+            $stmt = $pdo->prepare("UPDATE user_aquarium_settings SET last_cleaned_at = :now, dirt_level = 0 WHERE user_id = :user_id");
             $stmt->execute(['now' => $now, 'user_id' => $userId]);
-            $response = ['success' => true, 'message' => 'Akwarium wyczyszczone.', 'last_cleaned_at' => $now];
+            $response = ['success' => true, 'message' => 'Akwarium wyczyszczone.', 'last_cleaned_at' => $now, 'dirt_level' => 0];
             http_response_code(200);
         } else {
             http_response_code(400);

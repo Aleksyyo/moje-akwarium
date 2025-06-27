@@ -63,10 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
           const fishCard = document.createElement('div');
           fishCard.classList.add('fish-card');
           const imageName = fish.species_image_path || 'default_fish.png';
+          let details = '';
+          if (fish.weight) details += `<p>Waga: ${fish.weight} g</p>`;
+          if (fish.size) details += `<p>Rozmiar: ${fish.size} cm</p>`;
+          if (fish.description) details += `<p>Opis: ${fish.description}</p>`;
           fishCard.innerHTML = `
               <img src="assets/images/fish_icons/${imageName}" alt="${fish.species_name || 'Ryba'}" class="fish-card-image" onerror="this.src='assets/images/fish_icons/default_fish.png'; this.alt='Brak obrazka';">
               <h3>${fish.name}</h3>
               <p>Gatunek: ${fish.species_name || 'Nieznany'}</p>
+              ${details}
           `;
           fishGalleryGrid.appendChild(fishCard);
       });

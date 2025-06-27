@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPlacedDecorations = [];
   let availableDecorationTemplates = [];
   let selectedPlacedDecoration = null;
+  let hungerLevel = 100;
+  let dirtLevel = 0;
+  let hungerInterval = null;
+  let dirtInterval = null;
+  let statusIntervalsStarted = false;
 
 
   // --- Funkcje pomocnicze dla API ---
@@ -472,6 +477,12 @@ document.addEventListener('DOMContentLoaded', () => {
           const fishNameInput = document.getElementById('fish-name');
           const fishName = fishNameInput.value.trim();
           const speciesId = fishSpeciesSelect.value;
+          const fishWeightInput = document.getElementById('fish-weight');
+          const fishSizeInput = document.getElementById('fish-size');
+          const fishDescriptionInput = document.getElementById('fish-description');
+          const fishWeight = fishWeightInput && fishWeightInput.value ? parseFloat(fishWeightInput.value) : null;
+          const fishSize = fishSizeInput && fishSizeInput.value ? parseFloat(fishSizeInput.value) : null;
+          const fishDescription = fishDescriptionInput && fishDescriptionInput.value ? fishDescriptionInput.value.trim() : null;
 
           if (fishName === '') {
               if(modalErrorMessage) { modalErrorMessage.textContent = 'Nazwa ryby jest wymagana!'; modalErrorMessage.style.display = 'block';}
@@ -486,7 +497,13 @@ document.addEventListener('DOMContentLoaded', () => {
           if(modalErrorMessage) modalErrorMessage.style.display = 'none';
 
           try {
-              const newFishData = { name: fishName, species_id: speciesId };
+              const newFishData = {
+                  name: fishName,
+                  species_id: speciesId,
+                  weight: fishWeight,
+                  size: fishSize,
+                  description: fishDescription
+              };
               const result = await apiRequest('fish.php', 'POST', newFishData, true);
               if (result.success) {
                   loadUserFish();
@@ -504,25 +521,53 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Ustawienia i akcje akwarium ---
-  const updateAquariumVisuals = (settings) => {
-      if (!aquariumVisual) return;
-      if (settings.light_on) {
-          aquariumVisual.classList.add('light-on');
-          aquariumVisual.classList.remove('light-off');
-          if (toggleLightBtn) {
-              toggleLightBtn.setAttribute('data-status', 'on');
-              toggleLightBtn.textContent = 'Wyłącz Światło';
-          }
+  function updateLastActions(settings) {
+    const lastFed = document.getElementById('last-fed-info');
+    const lastCleaned = document.getElementById('last-cleaned-info');
+    const dateOpts = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false };
+    if (lastFed) {
+      if (settings.last_fed_at) {
+        const d = new Date(settings.last_fed_at.replace(' ', 'T'));
+        lastFed.textContent = 'Ostatnie karmienie: ' + d.toLocaleString('pl-PL', dateOpts);
       } else {
-          aquariumVisual.classList.add('light-off');
-          aquariumVisual.classList.remove('light-on');
-          if (toggleLightBtn) {
-              toggleLightBtn.setAttribute('data-status', 'off');
-              toggleLightBtn.textContent = 'Włącz Światło';
-          }
+        lastFed.textContent = 'Ostatnie karmienie: --';
       }
-      console.log("Ustawienia akwarium zaktualizowane na froncie:", settings);
-  };
+    }
+    if (lastCleaned) {
+      if (settings.last_cleaned_at) {
+        const d = new Date(settings.last_cleaned_at.replace(' ', 'T'));
+        lastCleaned.textContent = 'Ostatnie czyszczenie: ' + d.toLocaleString('pl-PL', dateOpts);
+      } else {
+        lastCleaned.textContent = 'Ostatnie czyszczenie: --';
+      }
+    }
+  }
+
+  let updateAquariumVisuals = (settings) => {
+    if (typeof settings.hunger_level === 'number') hungerLevel = settings.hunger_level;
+    if (typeof settings.dirt_level === 'number') dirtLevel = settings.dirt_level;
+    updateStatusBars();
+    updateLastActions(settings);
+    if (!statusIntervalsStarted) startStatusIntervals();
+    // Oryginalna logika światła
+    if (!aquariumVisual) return;
+    if (settings.light_on) {
+        aquariumVisual.classList.add('light-on');
+        aquariumVisual.classList.remove('light-off');
+        if (toggleLightBtn) {
+            toggleLightBtn.setAttribute('data-status', 'on');
+            toggleLightBtn.textContent = 'Wyłącz Światło';
+        }
+    } else {
+        aquariumVisual.classList.add('light-off');
+        aquariumVisual.classList.remove('light-on');
+        if (toggleLightBtn) {
+            toggleLightBtn.setAttribute('data-status', 'off');
+            toggleLightBtn.textContent = 'Włącz Światło';
+        }
+    }
+    console.log("Ustawienia akwarium zaktualizowane na froncie:", settings);
+  }
 
   const loadAquariumSettings = async () => {
       if (!localStorage.getItem('authToken')) return;
@@ -829,7 +874,7 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
           try {
               const data = await apiRequest('aquarium.php?action=toggle_light', 'POST', null, true);
               if (data.success) {
-                  updateAquariumVisuals({ light_on: data.light_on });
+                  updateAquariumVisuals(data);
               } else {
                   alert(`Błąd przełączania światła: ${data.message}`);
               }
@@ -844,6 +889,8 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
           try {
               const data = await apiRequest('aquarium.php?action=feed', 'POST', null, true);
               if (data.success) {
+                  hungerLevel = 0;
+                  updateStatusBars();
                   alert(`Ryby nakarmione! Ostatnio: ${new Date(data.last_fed_at).toLocaleString()}`);
                   showFeedingAnimation();
               } else {
@@ -860,6 +907,8 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
           try {
               const data = await apiRequest('aquarium.php?action=clean', 'POST', null, true);
               if (data.success) {
+                  dirtLevel = typeof data.dirt_level === 'number' ? data.dirt_level : 0;
+                  updateStatusBars();
                   alert(`Akwarium wyczyszczone! Ostatnio: ${new Date(data.last_cleaned_at).toLocaleString()}`);
                   showCleaningAnimation();
               } else {
@@ -950,4 +999,53 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
 
   // --- Inicjalizacja ---
   checkLoginStatus();
+
+  function updateStatusBars() {
+    const hungerBar = document.getElementById('hunger-bar');
+    const dirtBar = document.getElementById('dirt-bar');
+    const hungerValue = document.getElementById('hunger-value');
+    const dirtValue = document.getElementById('dirt-value');
+    const reminder = document.getElementById('aquarium-reminder');
+    if (hungerBar) hungerBar.style.width = Math.max(0, Math.min(100, hungerLevel)) + '%';
+    if (dirtBar) dirtBar.style.width = Math.max(0, Math.min(100, dirtLevel)) + '%';
+    if (hungerValue) hungerValue.textContent = Math.round(hungerLevel);
+    if (dirtValue) dirtValue.textContent = Math.round(dirtLevel);
+    if (reminder) {
+      let messages = [];
+      if (hungerLevel >= 70) messages.push('Nakarm ryby!');
+      if (dirtLevel >= 70) messages.push('Wyczyść akwarium!');
+      if (messages.length > 0) {
+        reminder.style.display = 'block';
+        reminder.innerHTML = messages.map(msg => `<div>${msg}</div>`).join('');
+      } else {
+        reminder.style.display = 'none';
+        reminder.innerHTML = '';
+      }
+    }
+  }
+
+  function startStatusIntervals() {
+    if (statusIntervalsStarted) return;
+    statusIntervalsStarted = true;
+    hungerInterval = setInterval(() => {
+      if (hungerLevel < 100) {
+        hungerLevel += 100/60;
+        if (hungerLevel > 100) hungerLevel = 100;
+        updateStatusBars();
+      }
+    }, 1000);
+    dirtInterval = setInterval(() => {
+      if (dirtLevel < 100) {
+        dirtLevel += 100/60;
+        if (dirtLevel > 100) dirtLevel = 100;
+        updateStatusBars();
+      }
+    }, 1000);
+  }
+
+  function stopStatusIntervals() {
+    if (hungerInterval) clearInterval(hungerInterval);
+    if (dirtInterval) clearInterval(dirtInterval);
+    statusIntervalsStarted = false;
+  }
 });

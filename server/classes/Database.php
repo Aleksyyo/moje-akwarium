@@ -156,5 +156,28 @@ class Database
             }
             error_log("Dodano domyślne gatunki ryb do bazy.");
         }
+
+        // --- MIGRACJE: dodaj brakujące kolumny jeśli nie istnieją ---
+        // user_aquarium_settings: hunger_level, dirt_level
+        $cols = $this->pdo->query("PRAGMA table_info(user_aquarium_settings)")->fetchAll(PDO::FETCH_ASSOC);
+        $colNames = array_column($cols, 'name');
+        if (!in_array('hunger_level', $colNames)) {
+            $this->pdo->exec("ALTER TABLE user_aquarium_settings ADD COLUMN hunger_level INTEGER DEFAULT 0");
+        }
+        if (!in_array('dirt_level', $colNames)) {
+            $this->pdo->exec("ALTER TABLE user_aquarium_settings ADD COLUMN dirt_level INTEGER DEFAULT 0");
+        }
+        // fish: weight, size, description
+        $colsFish = $this->pdo->query("PRAGMA table_info(fish)")->fetchAll(PDO::FETCH_ASSOC);
+        $colNamesFish = array_column($colsFish, 'name');
+        if (!in_array('weight', $colNamesFish)) {
+            $this->pdo->exec("ALTER TABLE fish ADD COLUMN weight REAL");
+        }
+        if (!in_array('size', $colNamesFish)) {
+            $this->pdo->exec("ALTER TABLE fish ADD COLUMN size REAL");
+        }
+        if (!in_array('description', $colNamesFish)) {
+            $this->pdo->exec("ALTER TABLE fish ADD COLUMN description TEXT");
+        }
     }
 }
