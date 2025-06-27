@@ -889,6 +889,65 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
       });
   }
 
+  // --- Dodawanie dekoracji do akwarium ---
+  const handleAddDecorationToAquarium = async (decoTemplate) => {
+      if (!decoTemplate || !decoTemplate.id) {
+          alert('Nieprawidłowa dekoracja.');
+          return;
+      }
+      // Ustaw dekorację w dolnej części akwarium
+      const aquarium = document.getElementById('aquarium-visual');
+      const aquariumHeight = aquarium ? aquarium.offsetHeight : 400;
+      const decoHeight = decoTemplate.default_height || 100;
+      const posY = aquariumHeight - decoHeight - 10; // 10px od dołu
+      const aquariumWidth = aquarium ? aquarium.offsetWidth : 800;
+      const decoWidth = decoTemplate.default_width || 100;
+      const minX = 10;
+      const maxX = aquariumWidth - decoWidth - 10;
+      const posX = minX + Math.floor(Math.random() * (maxX - minX + 1));
+      const width = decoWidth;
+      const height = decoHeight;
+      const rotation = 0;
+      const zIndex = 3;
+      try {
+          const result = await apiRequest('decorations.php?type=user', 'POST', {
+              decoration_id: decoTemplate.id,
+              pos_x: posX,
+              pos_y: posY,
+              width: width,
+              height: height,
+              rotation: rotation,
+              z_index: zIndex
+          }, true);
+          if (result.success) {
+              loadUserDecorations();
+          } else {
+              alert(result.message || 'Nie udało się dodać dekoracji.');
+          }
+      } catch (error) {
+          alert(error.message || 'Błąd podczas dodawania dekoracji.');
+      }
+  };
+
+  // --- Usuwanie wszystkich dekoracji ---
+  const removeAllDecorationsBtn = document.getElementById('remove-all-decorations-btn');
+  if (removeAllDecorationsBtn) {
+      removeAllDecorationsBtn.addEventListener('click', async () => {
+          if (confirm('Czy na pewno chcesz usunąć wszystkie dekoracje z akwarium?')) {
+              try {
+                  const result = await apiRequest('decorations.php?type=user&all=true', 'DELETE', null, true);
+                  if (result.success) {
+                      loadUserDecorations();
+                  } else {
+                      alert(result.message || 'Nie udało się usunąć dekoracji.');
+                  }
+              } catch (error) {
+                  alert(error.message || 'Błąd podczas usuwania dekoracji.');
+              }
+          }
+      });
+  }
+
   // --- Inicjalizacja ---
   checkLoginStatus();
 });

@@ -105,6 +105,12 @@ try {
                 http_response_code($userPlacedIdToUpdate ? 200 : 201);
             }
         }
+    } elseif ($method === 'DELETE' && $type === 'user' && isset($_GET['all']) && $_GET['all'] === 'true' && $userId) {
+        // Usuń wszystkie dekoracje użytkownika
+        $stmt = $pdo->prepare("DELETE FROM user_placed_decorations WHERE user_id = :user_id");
+        $stmt->execute(['user_id' => $userId]);
+        $response = ['success' => true, 'message' => 'Wszystkie dekoracje zostały usunięte.'];
+        http_response_code(200);
     } elseif ($method === 'DELETE' && $type === 'user' && $userDecorationId && $userId) {
         // Usuń konkretną dekorację użytkownika
         $stmt = $pdo->prepare("DELETE FROM user_placed_decorations WHERE id = :id AND user_id = :user_id");
