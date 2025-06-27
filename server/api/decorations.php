@@ -5,16 +5,14 @@ require_once __DIR__ . '/../classes/Database.php';
 
 header('Content-Type: application/json');
 
-$userData = authenticateUser(); // Uwierzytelnij, jeśli nie jest to publiczny endpoint
-$userId = $userData['userId'] ?? null; // userId będzie null, jeśli endpoint jest publiczny
+// Autoryzacja użytkownika (jeśli endpoint nie jest publiczny)
+$userData = authenticateUser();
+$userId = $userData['userId'] ?? null;
 
 $response = ['success' => false, 'message' => 'Nieznana operacja na dekoracjach.'];
 $method = $_SERVER['REQUEST_METHOD'];
-// Akcję możemy przekazywać w URL, np. ?type=available lub ?type=user
 $type = $_GET['type'] ?? null;
-// ID konkretnej dekoracji użytkownika (dla DELETE)
 $userDecorationId = $_GET['user_decoration_id'] ?? null;
-
 
 try {
     $pdo = Database::getInstance()->getConnection();
@@ -27,8 +25,7 @@ try {
             $response = ['success' => true, 'decorations' => $availableDecorations];
             http_response_code(200);
         } elseif ($type === 'user' && $userId) {
-            // Pobierz dekoracje umieszczone przez zalogowanego użytkownika
-            // Łączymy z available_decorations, aby uzyskać image_path i nazwę
+            // Pobierz dekoracje użytkownika
             $stmt = $pdo->prepare("
                 SELECT upd.id as user_placed_id, upd.pos_x, upd.pos_y, upd.width, upd.height, upd.rotation, upd.z_index,
                        ad.id as decoration_template_id, ad.name, ad.image_path, ad.default_width, ad.default_height
@@ -45,30 +42,28 @@ try {
             $response = ['success' => false, 'message' => 'Nieprawidłowy typ żądania GET lub brak autoryzacji.'];
         }
     } elseif ($method === 'POST' && $type === 'user' && $userId) {
-        // Dodaj/zaktualizuj dekorację użytkownika
         $input = json_decode(file_get_contents('php://input'), true);
-
-        $decorationId = $input['decoration_id'] ?? null; // ID z available_decorations
+        $decorationId = $input['decoration_id'] ?? null;
         $posX = $input['pos_x'] ?? 0;
         $posY = $input['pos_y'] ?? 0;
-        $width = $input['width'] ?? null; // Może być null, aby użyć domyślnej
+        $width = $input['width'] ?? null;
         $height = $input['height'] ?? null;
         $rotation = $input['rotation'] ?? 0;
         $zIndex = $input['z_index'] ?? 2;
-        $userPlacedIdToUpdate = $input['user_placed_id'] ?? null; // ID rekordu w user_placed_decorations do aktualizacji
+        $userPlacedIdToUpdate = $input['user_placed_id'] ?? null;
 
         if (!$decorationId) {
             http_response_code(400);
             $response = ['success' => false, 'message' => 'ID dekoracji (decoration_id) jest wymagane.'];
         } else {
-            // Sprawdź, czy decoration_id istnieje w available_decorations
+            // Walidacja: sprawdź, czy decoration_id istnieje
             $checkStmt = $pdo->prepare("SELECT id FROM available_decorations WHERE id = :id");
             $checkStmt->execute(['id' => $decorationId]);
             if (!$checkStmt->fetch()) {
                 http_response_code(400);
                 $response = ['success' => false, 'message' => 'Wybrany szablon dekoracji nie istnieje.'];
             } else {
-                if ($userPlacedIdToUpdate) { // Aktualizacja istniejącej
+                if ($userPlacedIdToUpdate) {
                     $sql = "UPDATE user_placed_decorations SET decoration_id = :decoration_id, pos_x = :pos_x, pos_y = :pos_y, width = :width, height = :height, rotation = :rotation, z_index = :z_index
                             WHERE id = :user_placed_id AND user_id = :user_id";
                     $stmt = $pdo->prepare($sql);
@@ -79,7 +74,7 @@ try {
                     ]);
                     $message = 'Dekoracja zaktualizowana.';
                     $newId = $userPlacedIdToUpdate;
-                } else { // Dodanie nowej
+                } else {
                     $sql = "INSERT INTO user_placed_decorations (user_id, decoration_id, pos_x, pos_y, width, height, rotation, z_index)
                             VALUES (:user_id, :decoration_id, :pos_x, :pos_y, :width, :height, :rotation, :z_index)";
                     $stmt = $pdo->prepare($sql);
@@ -90,7 +85,7 @@ try {
                     $newId = $pdo->lastInsertId();
                     $message = 'Dekoracja dodana.';
                 }
-                // Pobierz zaktualizowaną/dodaną dekorację, aby ją zwrócić
+                // Pobierz zaktualizowaną/dodaną dekorację
                 $fetchStmt = $pdo->prepare("
                     SELECT upd.id as user_placed_id, upd.pos_x, upd.pos_y, upd.width, upd.height, upd.rotation, upd.z_index,
                            ad.id as decoration_template_id, ad.name, ad.image_path, ad.default_width, ad.default_height
@@ -106,13 +101,12 @@ try {
             }
         }
     } elseif ($method === 'DELETE' && $type === 'user' && isset($_GET['all']) && $_GET['all'] === 'true' && $userId) {
-        // Usuń wszystkie dekoracje użytkownika
+        // Usuwanie wszystkich dekoracji użytkownika
         $stmt = $pdo->prepare("DELETE FROM user_placed_decorations WHERE user_id = :user_id");
         $stmt->execute(['user_id' => $userId]);
         $response = ['success' => true, 'message' => 'Wszystkie dekoracje zostały usunięte.'];
         http_response_code(200);
     } elseif ($method === 'DELETE' && $type === 'user' && $userDecorationId && $userId) {
-        // Usuń konkretną dekorację użytkownika
         $stmt = $pdo->prepare("DELETE FROM user_placed_decorations WHERE id = :id AND user_id = :user_id");
         $stmt->execute(['id' => $userDecorationId, 'user_id' => $userId]);
 

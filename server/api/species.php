@@ -5,13 +5,14 @@ require_once __DIR__ . '/../classes/Database.php'; // Dostęp do bazy
 
 header('Content-Type: application/json');
 
-// Uwierzytelnij użytkownika. Jeśli token jest nieprawidłowy, skrypt zakończy działanie.
-$userData = authenticateUser(); // Zwraca dane użytkownika z tokenu, np. ['userId' => 1, 'username' => 'test']
+// Autoryzacja użytkownika
+$userData = authenticateUser();
 
 $response = ['success' => false, 'message' => 'Nie udało się pobrać gatunków.'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
+        // Pobierz wszystkie gatunki ryb
         $pdo = Database::getInstance()->getConnection();
         $stmt = $pdo->query("SELECT id, name, image_path FROM fish_species ORDER BY name ASC");
         $species = $stmt->fetchAll(PDO::FETCH_ASSOC);

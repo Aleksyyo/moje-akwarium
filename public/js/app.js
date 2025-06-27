@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const API_BASE_URL = 'http://localhost:8000/api';
 
-  // --- Główne Elementy UI pobierane na początku ---
+  // Główne Elementy UI pobierane na początku
   const loginSection = document.getElementById('login-section');
   const registerSection = document.getElementById('register-section');
   const aquariumDashboard = document.getElementById('aquarium-dashboard');
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let statusIntervalsStarted = false;
 
 
-  // --- Funkcje pomocnicze dla API ---
+  // Funkcje pomocnicze dla API
   const apiRequest = async (endpoint, method = 'GET', body = null, requiresAuth = false) => {
       const headers = { 'Content-Type': 'application/json' };
       const token = localStorage.getItem('authToken');
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // --- Zarządzanie stanem zalogowania ---
+  // Zarządzanie stanem zalogowania
   const saveAuthData = (token, user, expiresIn) => {
       localStorage.setItem('authToken', token);
       localStorage.setItem('authUser', JSON.stringify(user));
@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return false;
   };
 
-  // --- Aktualizacja UI ---
+  // Aktualizacja UI
   const updateUIForLoggedInUser = (username) => {
       if (loginSection) loginSection.style.display = 'none';
       if (registerSection) registerSection.style.display = 'none';
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // --- Obsługa formularzy logowania/rejestracji ---
+  // Obsługa formularzy logowania/rejestracji
   // (Pełny kod tej sekcji jest w poprzedniej odpowiedzi - zakładam, że działa)
   if (loginForm) {
       loginForm.addEventListener('submit', async (event) => {
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error("Logout button not found");
   }
 
-  // --- Obsługa zmiany tła akwarium ---
+  // Obsługa zmiany tła akwarium
   const initializeBackgroundSelector = () => {
       if (backgroundSelector && aquariumBgLayer) {
           const defaultBgPath = "assets/images/aquarium_elements/background_aquarium_1.png";
@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // --- Logika ryb (graficzna i tekstowa) ---
+  // Logika ryb (graficzna i tekstowa)
   // (Funkcje renderFishEntities, animateAquarium, renderTextFishList, loadUserFish - bez zmian, jak w poprzedniej odpowiedzi)
   // Poniżej wklejam je dla kompletności.
   const renderFishEntities = (fishes) => {
@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // --- Modal dodawania ryby ---
+  // Modal dodawania ryby
   const loadFishSpecies = async () => {
       if (!fishSpeciesSelect) return;
       try {
@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // --- Ustawienia i akcje akwarium ---
+  // Ustawienia i akcje akwarium
   function updateLastActions(settings) {
     const lastFed = document.getElementById('last-fed-info');
     const lastCleaned = document.getElementById('last-cleaned-info');
@@ -583,7 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // --- Funkcja animacji karmienia ---
+  // Funkcja animacji karmienia
   const showFeedingAnimation = () => {
       if (!aquariumVisual) { console.error("Aquarium visual container not found for feeding animation."); return; }
       const numberOfPellets = 10 + Math.floor(Math.random() * 5);
@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // --- Funkcja animacji czyszczenia (zmiotka) ---
+  // Funkcja animacji czyszczenia (zmiotka)
   const showCleaningAnimation = () => {
       if (!aquariumVisual) { console.error("Aquarium visual container not found for cleaning animation."); return; }
       const brush = document.createElement('img');
@@ -688,7 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(animateBrushPass, 300);
   };
 
-  // --- Obsługa panelu dekoracji ---
+  // Obsługa panelu dekoracji
   if (decorateAquariumBtn) {
       decorateAquariumBtn.addEventListener('click', () => {
           if (decorationPanel) {
@@ -704,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // --- Funkcje związane z dekoracjami ---
+  // Funkcje związane z dekoracjami
   const loadAvailableDecorations = async () => {
       if (!availableDecorationsList) return;
       availableDecorationsList.innerHTML = '<p>Ładowanie...</p>';
@@ -868,7 +868,7 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
     }
 };
 
-  // --- Event Listenery dla przycisków akcji (światło, karmienie, czyszczenie, usuń wszystkie ryby) ---
+  // Event Listenery dla przycisków akcji (światło, karmienie, czyszczenie, usuń wszystkie ryby)
   if (toggleLightBtn) {
       toggleLightBtn.addEventListener('click', async () => {
           try {
@@ -949,7 +949,7 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
       });
   }
 
-  // --- Dodawanie dekoracji do akwarium ---
+  // Dodawanie dekoracji do akwarium
   const handleAddDecorationToAquarium = async (decoTemplate) => {
       if (!decoTemplate || !decoTemplate.id) {
           alert('Nieprawidłowa dekoracja.');
@@ -989,7 +989,7 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
       }
   };
 
-  // --- Usuwanie wszystkich dekoracji ---
+  // Usuwanie wszystkich dekoracji
   const removeAllDecorationsBtn = document.getElementById('remove-all-decorations-btn');
   if (removeAllDecorationsBtn) {
       removeAllDecorationsBtn.addEventListener('click', async () => {
@@ -1008,7 +1008,7 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
       });
   }
 
-  // --- Inicjalizacja ---
+  // Inicjalizacja
   checkLoginStatus();
 
   function updateStatusBars() {

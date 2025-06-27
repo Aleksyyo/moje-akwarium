@@ -1,7 +1,7 @@
 <?php
 // server/config/config.php
 
-// Definiowanie stałych dla ścieżek
+// Ostrzeżenie: zmień JWT_SECRET_KEY na własny klucz w środowisku produkcyjnym!
 define('PROJECT_ROOT_PATH', dirname(dirname(__DIR__))); // Główny katalog projektu (moje-akwarium)
 define('SERVER_ROOT_PATH', dirname(__DIR__)); // Główny katalog serwera (server)
 define('PUBLIC_PATH', PROJECT_ROOT_PATH . '/public');

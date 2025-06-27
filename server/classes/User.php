@@ -11,10 +11,7 @@ class User {
         $this->pdo = Database::getInstance()->getConnection();
     }
 
-    // Metoda register bez zmian
-
     public function register($username, $password) {
-        // ... (kod metody register bez zmian) ...
         if (empty($username) || empty($password)) {
             return ['success' => false, 'message' => 'Nazwa użytkownika i hasło są wymagane.'];
         }
@@ -37,7 +34,6 @@ class User {
         }
     }
 
-
     public function login($username, $password) {
         if (empty($username) || empty($password)) {
             return ['success' => false, 'message' => 'Nazwa użytkownika i hasło są wymagane.'];
@@ -52,15 +48,14 @@ class User {
 
             // Generowanie tokenu JWT
             $issuedAt = time();
-            $expirationTime = $issuedAt + JWT_EXPIRATION_TIME; // Token ważny przez 1 godzinę (z config)
-
+            $expirationTime = $issuedAt + JWT_EXPIRATION_TIME;
             $payload = [
-                'iss' => JWT_ISSUER,        // Kto wystawił token
-                'aud' => JWT_AUDIENCE,      // Dla kogo jest token
-                'iat' => $issuedAt,         // Kiedy został wystawiony (timestamp)
-                'nbf' => $issuedAt,         // Nie przed (timestamp) - token ważny od teraz
-                'exp' => $expirationTime,   // Kiedy wygasa (timestamp)
-                'data' => [                 // Dane użytkownika w tokenie
+                'iss' => JWT_ISSUER,
+                'aud' => JWT_AUDIENCE,
+                'iat' => $issuedAt,
+                'nbf' => $issuedAt,
+                'exp' => $expirationTime,
+                'data' => [
                     'userId' => $user['id'],
                     'username' => $user['username']
                 ]
@@ -72,7 +67,7 @@ class User {
                     'success' => true,
                     'message' => 'Logowanie pomyślne.',
                     'token' => $jwt,
-                    'user' => [ // Zwracamy też podstawowe info o userze dla frontendu
+                    'user' => [
                         'id' => $user['id'],
                         'username' => $user['username']
                     ],

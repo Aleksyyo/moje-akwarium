@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const API_BASE_URL = 'http://localhost:8000/api'; // Upewnij się, że jest zgodne z app.js
   const logoutNavItemGallery = document.getElementById('logout-nav-item');
 
-  // --- Funkcje pomocnicze dla API ---
+  // Funkcje pomocnicze dla API
   const apiRequest = async (endpoint, method = 'GET', body = null, requiresAuth = false) => {
       const headers = { 'Content-Type': 'application/json' };
       const token = localStorage.getItem('authToken');
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // --- Zarządzanie wylogowaniem na stronie galerii ---
+  // Zarządzanie wylogowaniem na stronie galerii
   const clearAuthDataGallery = () => {
       localStorage.removeItem('authToken');
       localStorage.removeItem('authUser');
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  // --- Inicjalizacja Galerii ---
+  // Inicjalizacja Galerii
   if (checkGalleryLoginStatus()) {
       if (logoutNavItemGallery) logoutNavItemGallery.style.display = 'list-item';
       loadGalleryFish();

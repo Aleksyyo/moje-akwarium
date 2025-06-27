@@ -1,15 +1,13 @@
 <?php
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth_middleware.php';
-require_once __DIR__ . '/../classes/Database.php'; // Będziemy potrzebować klasy Fish
-
-// Na razie nie mamy klasy Fish, więc zrobimy prostą logikę tutaj
-// W przyszłości przeniesiemy to do klasy Fish.php
+require_once __DIR__ . '/../classes/Database.php';
 
 header('Content-Type: application/json');
 
-$userData = authenticateUser(); // Uwierzytelnij
-$userId = $userData['userId']; // Pobierz ID zalogowanego użytkownika
+// Autoryzacja użytkownika
+$userData = authenticateUser();
+$userId = $userData['userId'];
 
 $response = ['success' => false, 'message' => 'Nieznana operacja na rybach.'];
 $method = $_SERVER['REQUEST_METHOD'];
@@ -18,8 +16,7 @@ try {
     $pdo = Database::getInstance()->getConnection();
 
     if ($method === 'GET') {
-        // Pobierz wszystkie ryby dla zalogowanego użytkownika
-        // Łączymy z fish_species, aby uzyskać nazwę gatunku i ścieżkę obrazka
+        // Pobierz wszystkie ryby użytkownika wraz z nazwą gatunku i ścieżką obrazka
         $stmt = $pdo->prepare("
             SELECT f.id, f.name, f.added_at, f.weight, f.size, f.description, fs.name as species_name, fs.image_path as species_image_path
             FROM fish f
@@ -44,7 +41,7 @@ try {
             http_response_code(400);
             $response = ['success' => false, 'message' => 'Nazwa ryby i ID gatunku są wymagane.'];
         } else {
-            // Sprawdź, czy gatunek istnieje (opcjonalne, ale dobre)
+            // Walidacja: sprawdź, czy gatunek istnieje
             $stmtCheck = $pdo->prepare("SELECT id FROM fish_species WHERE id = :species_id");
             $stmtCheck->execute(['species_id' => $speciesId]);
             if (!$stmtCheck->fetch()) {
@@ -67,10 +64,10 @@ try {
         }
       } elseif ($method === 'DELETE') {
         $fishIdToDelete = $_GET['id'] ?? null;
-        $deleteAll = isset($_GET['all']) && $_GET['all'] === 'true'; // Nowy parametr
+        $deleteAll = isset($_GET['all']) && $_GET['all'] === 'true';
 
         if ($deleteAll) {
-            // Usuń wszystkie ryby dla zalogowanego użytkownika
+            // Usuwanie wszystkich ryb użytkownika
             $stmt = $pdo->prepare("DELETE FROM fish WHERE user_id = :user_id");
             $stmt->execute(['user_id' => $userId]);
             $deletedCount = $stmt->rowCount();
@@ -78,7 +75,6 @@ try {
             http_response_code(200);
 
         } elseif (!empty($fishIdToDelete)) {
-            // Usuwanie pojedynczej ryby (istniejąca logika)
             $stmt = $pdo->prepare("DELETE FROM fish WHERE id = :id AND user_id = :user_id");
             $stmt->execute(['id' => $fishIdToDelete, 'user_id' => $userId]);
             if ($stmt->rowCount() > 0) {
@@ -93,7 +89,7 @@ try {
             $response = ['success' => false, 'message' => 'ID ryby do usunięcia lub parametr "all=true" jest wymagany.'];
         }
     } else {
-        http_response_code(405); // Method Not Allowed
+        http_response_code(405);
         $response = ['success' => false, 'message' => 'Niedozwolona metoda HTTP.'];
     }
 
@@ -101,8 +97,8 @@ try {
     error_log("Błąd API fish: " . $e->getMessage());
     http_response_code(500);
     $response = ['success' => false, 'message' => 'Błąd serwera podczas operacji na rybach.'];
-} catch (Exception $e) { // Inne błędy, np. z auth_middleware
-    http_response_code(500); // Lub odpowiedni kod błędu z wyjątku
+} catch (Exception $e) {
+    http_response_code(500);
     $response = ['success' => false, 'message' => $e->getMessage()];
 }
 

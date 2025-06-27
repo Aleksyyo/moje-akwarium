@@ -13,13 +13,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'register') {
         $username = $input['username'] ?? null;
         $password = $input['password'] ?? null;
-        // $email = $input['email'] ?? null; // USUWAMY POBIERANIE EMAILA
-        $response = $userHandler->register($username, $password); // Przekazujemy tylko username i password
+        $response = $userHandler->register($username, $password);
     } elseif ($action === 'login') {
-        // Zmieniamy 'usernameOrEmail' na 'username'
         $username = $input['username'] ?? null;
         $password = $input['password'] ?? null;
-        $response = $userHandler->login($username, $password); // Przekazujemy tylko username i password
+        $response = $userHandler->login($username, $password);
     } else {
         $response = ['success' => false, 'message' => 'Nieznana akcja POST. Dostępne: register, login.'];
     }
@@ -28,13 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $response = ['success' => false, 'message' => 'Metoda HTTP nie jest obsługiwana. Użyj POST.'];
 }
 
-// ... (reszta kodu ustawiająca kody HTTP i zwracająca JSON bez zmian) ...
 if (isset($response['success']) && !$response['success']) {
     if (strpos($response['message'], 'Błąd serwera') !== false) {
         http_response_code(500);
     } else if (strpos($response['message'], 'wymagane') !== false || strpos($response['message'], 'Nieprawidłowy') !== false || strpos($response['message'], 'już istnieje') !== false) {
         http_response_code(400);
-    } else if (strpos($response['message'], 'Nieprawidłowa nazwa użytkownika lub hasło') !== false) { // Zmieniono z "Nieprawidłowa nazwa użytkownika/email lub hasło"
+    } else if (strpos($response['message'], 'Nieprawidłowa nazwa użytkownika lub hasło') !== false) {
         http_response_code(401);
     }
 } else if (isset($response['success']) && $response['success'] && $action === 'register') {
