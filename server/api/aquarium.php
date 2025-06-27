@@ -15,7 +15,7 @@ $action = $_GET['action'] ?? null;
 try {
     $pdo = Database::getInstance()->getConnection();
 
-    // Funkcja pomocnicza do pobierania lub tworzenia ustawień użytkownika
+    // --- Funkcja pomocnicza: pobieranie lub tworzenie ustawień użytkownika w bazie ---
     function getOrCreateUserSettings($pdo, $userId) {
         $stmt = $pdo->prepare("SELECT * FROM user_aquarium_settings WHERE user_id = :user_id");
         $stmt->execute(['user_id' => $userId]);
@@ -32,24 +32,50 @@ try {
         return $settings;
     }
 
+    // --- Funkcja pomocnicza: dynamiczne wyliczanie wskaźników głodu i brudu na podstawie czasu ---
+    function calculateLevels($settings) {
+        // Parametry: ile czasu (w sekundach) do pełnego 100%
+        $maxSeconds = 3600; // 1 godzina do pełnego 100
+        $now = time();
+        // GŁÓD
+        $lastFed = isset($settings['last_fed_at']) && $settings['last_fed_at'] ? strtotime($settings['last_fed_at']) : null;
+        if ($lastFed) {
+            $delta = $now - $lastFed;
+            $hunger = min(100, max(0, round($delta / $maxSeconds * 100)));
+        } else {
+            $hunger = 100;
+        }
+        // BRUD
+        $lastCleaned = isset($settings['last_cleaned_at']) && $settings['last_cleaned_at'] ? strtotime($settings['last_cleaned_at']) : null;
+        if ($lastCleaned) {
+            $delta = $now - $lastCleaned;
+            $dirt = min(100, max(0, round($delta / $maxSeconds * 100)));
+        } else {
+            $dirt = 100;
+        }
+        $settings['hunger_level'] = $hunger;
+        $settings['dirt_level'] = $dirt;
+        return $settings;
+    }
+
+    // --- Obsługa endpointów API: GET ustawień, POST toggle_light/feed/clean ---
     if ($method === 'GET' && $action === null) { // Pobieranie ustawień
         $settings = getOrCreateUserSettings($pdo, $userId);
-        // Konwertuj light_status na bardziej czytelny format dla frontendu
+        $settings = calculateLevels($settings);
         $settings['light_on'] = (bool)$settings['light_status'];
-        unset($settings['light_status']); // Usuń oryginalne pole, jeśli chcesz
-
+        unset($settings['light_status']);
         $response = ['success' => true, 'settings' => $settings];
         http_response_code(200);
 
     } elseif ($method === 'POST') {
-        $currentSettings = getOrCreateUserSettings($pdo, $userId); // Pobierz bieżące/utwórz
+        $currentSettings = getOrCreateUserSettings($pdo, $userId);
 
         if ($action === 'toggle_light') {
             $newLightStatus = $currentSettings['light_status'] == 1 ? 0 : 1;
             $stmt = $pdo->prepare("UPDATE user_aquarium_settings SET light_status = :light_status WHERE user_id = :user_id");
             $stmt->execute(['light_status' => $newLightStatus, 'user_id' => $userId]);
-            // Pobierz aktualne wartości po zmianie
             $settings = getOrCreateUserSettings($pdo, $userId);
+            $settings = calculateLevels($settings);
             $response = [
                 'success' => true,
                 'message' => 'Światło przełączone.',

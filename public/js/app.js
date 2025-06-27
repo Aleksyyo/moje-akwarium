@@ -874,7 +874,18 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
           try {
               const data = await apiRequest('aquarium.php?action=toggle_light', 'POST', null, true);
               if (data.success) {
-                  updateAquariumVisuals(data);
+                  // Zmień tylko wygląd światła i tekst przycisku
+                  if (data.light_on) {
+                      aquariumVisual.classList.add('light-on');
+                      aquariumVisual.classList.remove('light-off');
+                      toggleLightBtn.setAttribute('data-status', 'on');
+                      toggleLightBtn.textContent = 'Wyłącz Światło';
+                  } else {
+                      aquariumVisual.classList.add('light-off');
+                      aquariumVisual.classList.remove('light-on');
+                      toggleLightBtn.setAttribute('data-status', 'off');
+                      toggleLightBtn.textContent = 'Włącz Światło';
+                  }
               } else {
                   alert(`Błąd przełączania światła: ${data.message}`);
               }
