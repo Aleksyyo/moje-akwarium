@@ -768,6 +768,7 @@ footer {
   margin: 1.2rem 0 1.5rem 0;
   align-items: flex-end;
   flex-wrap: wrap;
+  position: relative;
 }
 .status-indicator {
   display: flex;
@@ -813,13 +814,14 @@ footer {
   border-radius: 6px;
   padding: 0.5rem 1rem;
   font-weight: bold;
-  margin-bottom: 0.7rem;
-  margin-top: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   display: inline-block;
   font-size: 1.05rem;
-  position: relative;
-  top: -1.2rem;
+  position: absolute;
+  left: 50%;
+  top: 0.2rem;
+  transform: translateX(-50%);
+  z-index: 20;
 }
 
 .status-indicator span:last-child {
