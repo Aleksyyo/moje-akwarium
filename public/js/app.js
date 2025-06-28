@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerSection = document.getElementById('register-section');
   const aquariumDashboard = document.getElementById('aquarium-dashboard');
   const logoutNavItem = document.getElementById('logout-nav-item');
+  const galleryNavItem = document.getElementById('gallery-nav-item');
   const welcomeUsernameSpan = document.getElementById('welcome-username');
   const logoutButton = document.getElementById('logout-button');
 
@@ -146,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (registerSection) registerSection.style.display = 'none';
       if (aquariumDashboard) aquariumDashboard.style.display = 'block';
       if (logoutNavItem) logoutNavItem.style.display = 'list-item';
+      if (galleryNavItem) galleryNavItem.style.display = 'list-item';
       if (welcomeUsernameSpan) welcomeUsernameSpan.textContent = username;
       loadUserFish();
       loadAquariumSettings();
@@ -158,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (registerSection) registerSection.style.display = 'none';
       if (aquariumDashboard) aquariumDashboard.style.display = 'none';
       if (logoutNavItem) logoutNavItem.style.display = 'none';
+      if (galleryNavItem) galleryNavItem.style.display = 'none';
       if (welcomeUsernameSpan) welcomeUsernameSpan.textContent = '';
       if (fishEntitiesLayer) fishEntitiesLayer.innerHTML = '<p style="text-align:center; padding-top: 50px; color: white;">Zaloguj się, aby zobaczyć akwarium.</p>';
       if (fishList) fishList.innerHTML = '<li>Zaloguj się, aby zobaczyć swoje ryby.</li>';

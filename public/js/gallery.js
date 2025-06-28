@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const fishGalleryGrid = document.querySelector('#fish-gallery-section .gallery-grid');
   const API_BASE_URL = 'http://localhost:8000/api'; // Upewnij się, że jest zgodne z app.js
   const logoutNavItemGallery = document.getElementById('logout-nav-item');
+  const galleryNavItemGallery = document.getElementById('gallery-nav-item');
 
   // Funkcje pomocnicze dla API
   const apiRequest = async (endpoint, method = 'GET', body = null, requiresAuth = false) => {
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   console.warn("Token wygasł lub nieprawidłowy na stronie galerii.");
                   // Wyloguj użytkownika, jeśli token jest zły
                   if (logoutNavItemGallery) logoutNavItemGallery.style.display = 'none'; // Ukryj przycisk wyloguj
+                  if (galleryNavItemGallery) galleryNavItemGallery.style.display = 'none'; // Ukryj przycisk galeria
                   clearAuthDataGallery(); // Wyczyść dane autoryzacyjne
                   if (fishGalleryGrid) {
                       fishGalleryGrid.innerHTML = `<p>Sesja wygasła lub problem z autoryzacją. <a href="index.html" class="button-like">Zaloguj się ponownie</a></p>`;
@@ -47,8 +49,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const expiryString = localStorage.getItem('authTokenExpiry');
       if (token && expiryString) {
           const expiryTime = parseInt(expiryString, 10);
-          if (new Date().getTime() < expiryTime) return true;
+          if (new Date().getTime() < expiryTime) {
+              // Pokaż przyciski nawigacji dla zalogowanego użytkownika
+              if (logoutNavItemGallery) logoutNavItemGallery.style.display = 'list-item';
+              if (galleryNavItemGallery) galleryNavItemGallery.style.display = 'list-item';
+              return true;
+          }
       }
+      // Ukryj przyciski nawigacji dla niezalogowanego użytkownika
+      if (logoutNavItemGallery) logoutNavItemGallery.style.display = 'none';
+      if (galleryNavItemGallery) galleryNavItemGallery.style.display = 'none';
       return false;
   };
 
@@ -100,6 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('authToken');
       localStorage.removeItem('authUser');
       localStorage.removeItem('authTokenExpiry');
+      // Ukryj przyciski nawigacji po wylogowaniu
+      if (logoutNavItemGallery) logoutNavItemGallery.style.display = 'none';
+      if (galleryNavItemGallery) galleryNavItemGallery.style.display = 'none';
   };
 
   const updateUIAfterLogoutGallery = () => {
