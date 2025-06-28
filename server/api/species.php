@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../config/config.php'; // Zawiera autoloader i ustawienia JWT
+require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../includes/auth_middleware.php'; // Middleware do autentykacji
 require_once __DIR__ . '/../classes/Database.php'; // Dostęp do bazy
 

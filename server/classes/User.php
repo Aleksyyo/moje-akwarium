@@ -2,7 +2,7 @@
 require_once __DIR__ . '/Database.php';
 // Importowanie klas JWT
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key; // Potrzebne dla nowszych wersji biblioteki
+use Firebase\JWT\Key; 
 
 class User {
     private $pdo;

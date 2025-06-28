@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const API_BASE_URL = 'http://localhost:8000/api';
 
-  // Główne Elementy UI pobierane na początku
   const loginSection = document.getElementById('login-section');
   const registerSection = document.getElementById('register-section');
   const aquariumDashboard = document.getElementById('aquarium-dashboard');
@@ -37,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalErrorMessage = document.getElementById('modal-error-message');
   const fishSpeciesSelect = document.getElementById('fish-species');
 
-  // Elementy dla dekoracji
   const decorateAquariumBtn = document.getElementById('decorate-aquarium-btn');
   const decorationPanel = document.getElementById('decoration-panel');
   const closeDecorationPanelBtn = document.getElementById('close-decoration-panel');
@@ -48,12 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const aquariumBgLayer = document.querySelector('#aquarium-visual .aquarium-bg-layer');
 
 
-  // Globalne zmienne
   let activeFishEntities = [];
   let animationFrameId = null;
   let currentPlacedDecorations = [];
   let availableDecorationTemplates = [];
-  let selectedPlacedDecoration = null;
   let hungerLevel = 100;
   let dirtLevel = 0;
   let hungerInterval = null;
@@ -141,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return false;
   };
 
-  // Aktualizacja UI
   const updateUIForLoggedInUser = (username) => {
       if (loginSection) loginSection.style.display = 'none';
       if (registerSection) registerSection.style.display = 'none';
@@ -166,12 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (fishList) fishList.innerHTML = '<li>Zaloguj się, aby zobaczyć swoje ryby.</li>';
       if (aquariumDecorationsLayer) aquariumDecorationsLayer.innerHTML = '';
       currentPlacedDecorations = [];
-      selectedPlacedDecoration = null;
-      // Usunięcie globalnego przycisku usuwania, jeśli istniał
-      const tempDeleteBtn = document.getElementById('temp-delete-deco-btn');
-      if (tempDeleteBtn && tempDeleteBtn.parentNode) {
-          tempDeleteBtn.parentNode.removeChild(tempDeleteBtn);
-      }
 
       if (animationFrameId) {
           cancelAnimationFrame(animationFrameId);
@@ -181,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Obsługa formularzy logowania/rejestracji
-  // (Pełny kod tej sekcji jest w poprzedniej odpowiedzi - zakładam, że działa)
   if (loginForm) {
       loginForm.addEventListener('submit', async (event) => {
           event.preventDefault();
@@ -291,8 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Logika ryb (graficzna i tekstowa)
-  // (Funkcje renderFishEntities, animateAquarium, renderTextFishList, loadUserFish - bez zmian, jak w poprzedniej odpowiedzi)
-  // Poniżej wklejam je dla kompletności.
   const renderFishEntities = (fishes) => {
       if (!fishEntitiesLayer) { console.error("Fish entities layer not found!"); return; }
       fishEntitiesLayer.innerHTML = '';
@@ -421,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // Modal dodawania ryby
+  // Dodawanie ryby do akwarium
   const loadFishSpecies = async () => {
       if (!fishSpeciesSelect) return;
       try {
@@ -552,7 +538,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStatusBars();
     updateLastActions(settings);
     if (!statusIntervalsStarted) startStatusIntervals();
-    // Oryginalna logika światła
     if (!aquariumVisual) return;
     if (settings.light_on) {
         aquariumVisual.classList.add('light-on');
@@ -632,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   };
 
-  // Funkcja animacji czyszczenia (zmiotka)
+  // Funkcja animacji czyszczenia
   const showCleaningAnimation = () => {
       if (!aquariumVisual) { console.error("Aquarium visual container not found for cleaning animation."); return; }
       const brush = document.createElement('img');
@@ -766,8 +751,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Warstwa dekoracji (#aquarium-decorations) nie znaleziona!");
         return;
     }
-    aquariumDecorationsLayer.innerHTML = ''; // Wyczyść poprzednie
-    console.log("Renderowanie umieszczonych dekoracji:", placedDecorations); // LOG
+    aquariumDecorationsLayer.innerHTML = '';
+    console.log("Renderowanie umieszczonych dekoracji:", placedDecorations);
 
     placedDecorations.forEach(deco => {
         const decoWrapper = document.createElement('div');
@@ -777,7 +762,7 @@ document.addEventListener('DOMContentLoaded', () => {
         decoWrapper.style.top = `${deco.pos_y}px`;
         decoWrapper.style.width = deco.width ? `${deco.width}px` : `${deco.default_width || 100}px`;
         decoWrapper.style.transform = `rotate(${deco.rotation || 0}deg)`;
-        decoWrapper.style.zIndex = deco.z_index || 3; // Zmieniono z-index na 3, aby był spójny z rybami na 4
+        decoWrapper.style.zIndex = deco.z_index || 3;
         decoWrapper.dataset.userPlacedId = deco.user_placed_id;
 
         const decoImg = document.createElement('img');
@@ -791,84 +776,9 @@ document.addEventListener('DOMContentLoaded', () => {
             decoImg.style.height = `${deco.height}px`;
         }
 
-        const deleteDecoBtn = document.createElement('span');
-        deleteDecoBtn.classList.add('delete-placed-deco-btn');
-        deleteDecoBtn.innerHTML = '&times;';
-        deleteDecoBtn.title = 'Usuń dekorację';
-        deleteDecoBtn.style.display = 'none'; // Domyślnie ukryty
-
-        deleteDecoBtn.addEventListener('click', async (e) => {
-            e.stopPropagation(); // Zapobiegaj zaznaczeniu po kliknięciu X
-            console.log(`Kliknięto X dla dekoracji ID: ${deco.user_placed_id}, Nazwa: ${deco.name}`); // LOG
-            if (confirm(`Czy na pewno chcesz usunąć "${deco.name}"?`)) {
-                console.log(`Potwierdzono usunięcie dekoracji ID: ${deco.user_placed_id}`); // LOG
-                try {
-                    const result = await apiRequest(`decorations.php?type=user&user_decoration_id=${deco.user_placed_id}`, 'DELETE', null, true);
-                    console.log("Odpowiedź API na usunięcie:", result); // LOG
-                    if (result.success) {
-                        console.log("Dekoracja usunięta pomyślnie z serwera."); // LOG
-                        loadUserDecorations(); // Odśwież widok dekoracji
-                        selectedPlacedDecoration = null; // Odznacz, jeśli była zaznaczona
-                    } else {
-                        alert(`Nie udało się usunąć dekoracji: ${result.message}`);
-                    }
-                } catch (error) {
-                    console.error("Błąd API podczas usuwania dekoracji:", error); // LOG
-                    alert(`Błąd serwera podczas usuwania dekoracji: ${error.message}`);
-                }
-            } else {
-                console.log(`Anulowano usunięcie dekoracji ID: ${deco.user_placed_id}`); // LOG
-            }
-        });
-
         decoWrapper.appendChild(decoImg);
-        decoWrapper.appendChild(deleteDecoBtn); // Upewnij się, że przycisk jest dodany do DOM
         aquariumDecorationsLayer.appendChild(decoWrapper);
-
-        decoWrapper.addEventListener('click', (e) => {
-            // Nie chcemy, aby kliknięcie na już zaznaczony przycisk 'X' ponownie wywoływało handleSelect
-            if (e.target !== deleteDecoBtn) {
-                console.log("Wrapper kliknięty (nie przycisk X), user_placed_id:", deco.user_placed_id); // LOG
-                handleSelectPlacedDecoration(decoWrapper, deco);
-            }
-        });
     });
-};
-
-const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
-    console.log("handleSelectPlacedDecoration wywołana dla:", decoData.name, "ID:", decoData.user_placed_id); // LOG
-
-    // Odznacz poprzednią, jeśli istnieje i jest inna niż aktualnie kliknięta
-    if (selectedPlacedDecoration && selectedPlacedDecoration.element && selectedPlacedDecoration.element !== decoWrapperElement) {
-        console.log("Odznaczanie poprzedniej:", selectedPlacedDecoration.data.name); // LOG
-        selectedPlacedDecoration.element.style.outline = 'none';
-        const prevDeleteBtn = selectedPlacedDecoration.element.querySelector('.delete-placed-deco-btn');
-        if (prevDeleteBtn) {
-            prevDeleteBtn.style.display = 'none';
-            console.log("Ukryto przycisk usuwania dla poprzedniej."); // LOG
-        }
-    }
-
-    // Przełącz zaznaczenie dla aktualnie klikniętego elementu
-    if (selectedPlacedDecoration && selectedPlacedDecoration.element === decoWrapperElement) {
-        // Jeśli kliknięto ten sam element, odznacz go
-        decoWrapperElement.style.outline = 'none';
-        const currentDeleteBtn = decoWrapperElement.querySelector('.delete-placed-deco-btn');
-        if (currentDeleteBtn) currentDeleteBtn.style.display = 'none';
-        selectedPlacedDecoration = null;
-        console.log("Odznaczono dekorację:", decoData.name); // LOG
-    } else {
-        // Zaznacz nowy element
-        decoWrapperElement.style.outline = '2px dashed #8e2de2';
-        const currentDeleteBtn = decoWrapperElement.querySelector('.delete-placed-deco-btn');
-        if (currentDeleteBtn) {
-            currentDeleteBtn.style.display = 'block';
-            console.log("Pokazano przycisk usuwania dla:", decoData.name, currentDeleteBtn); // LOG
-        } else {
-            console.error("Nie znaleziono przycisku .delete-placed-deco-btn wewnątrz wrapper'a", decoWrapperElement);
-        }
-        selectedPlacedDecoration = { element: decoWrapperElement, data: decoData };
-    }
 };
 
   // Event Listenery dla przycisków akcji (światło, karmienie, czyszczenie, usuń wszystkie ryby)
@@ -877,7 +787,6 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
           try {
               const data = await apiRequest('aquarium.php?action=toggle_light', 'POST', null, true);
               if (data.success) {
-                  // Zmień tylko wygląd światła i tekst przycisku
                   if (data.light_on) {
                       aquariumVisual.classList.add('light-on');
                       aquariumVisual.classList.remove('light-off');
@@ -962,7 +871,7 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
       const aquarium = document.getElementById('aquarium-visual');
       const aquariumHeight = aquarium ? aquarium.offsetHeight : 400;
       const decoHeight = decoTemplate.default_height || 100;
-      const posY = aquariumHeight - decoHeight - 10; // 10px od dołu
+      const posY = aquariumHeight - decoHeight - 10;
       const aquariumWidth = aquarium ? aquarium.offsetWidth : 800;
       const decoWidth = decoTemplate.default_width || 100;
       const minX = 10;
@@ -1011,7 +920,6 @@ const handleSelectPlacedDecoration = (decoWrapperElement, decoData) => {
       });
   }
 
-  // Inicjalizacja
   checkLoginStatus();
 
   function updateStatusBars() {

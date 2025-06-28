@@ -1,6 +1,5 @@
 <?php
-// Ten plik powinien być dołączany na początku chronionych endpointów API
-// require_once __DIR__ . '/../config/config.php'; // config.php jest już dołączony w pliku endpointu
+
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
@@ -17,7 +16,6 @@ function authenticateUser() {
         exit();
     }
 
-    // Oczekiwany format: "Bearer <token>"
     list($type, $token) = explode(' ', $authHeader, 2);
 
     if (strcasecmp($type, 'Bearer') !== 0 || empty($token)) {
@@ -27,7 +25,6 @@ function authenticateUser() {
     }
 
     try {
-        // Dekodowanie i weryfikacja tokenu JWT
         $decoded = JWT::decode($token, new Key(JWT_SECRET_KEY, JWT_ALGORITHM));
         return (array) $decoded->data;
     } catch (ExpiredException $e) {

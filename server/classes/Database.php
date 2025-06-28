@@ -17,7 +17,6 @@ class Database
                 $this->pdo = new PDO('sqlite:' . DB_PATH);
                 $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-                // Włącz obsługę kluczy obcych dla SQLite
                 $this->pdo->exec('PRAGMA foreign_keys = ON;');
                 $this->initSchema();
             }
@@ -99,7 +98,6 @@ class Database
             $this->pdo->exec($tableQuery);
         }
 
-        // Dodanie przykładowych dostępnych dekoracji, jeśli tabela jest pusta
         $stmt = $this->pdo->query("SELECT COUNT(*) as count FROM available_decorations");
         $count = $stmt->fetchColumn();
         if ($count == 0) {
@@ -122,7 +120,6 @@ class Database
             error_log("Dodano domyślne dostępne dekoracje do bazy.");
         }
 
-        // Dodanie przykładowych gatunków ryb, jeśli tabela jest pusta
         $stmt = $this->pdo->query("SELECT COUNT(*) as count FROM fish_species");
         $count = $stmt->fetchColumn();
         if ($count == 0) {
@@ -141,7 +138,6 @@ class Database
             error_log("Dodano domyślne gatunki ryb do bazy.");
         }
 
-        // Migracje: dodaj brakujące kolumny jeśli nie istnieją
         $cols = $this->pdo->query("PRAGMA table_info(user_aquarium_settings)")->fetchAll(PDO::FETCH_ASSOC);
         $colNames = array_column($cols, 'name');
         if (!in_array('hunger_level', $colNames)) {
